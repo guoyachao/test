@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>装修灵感集 | 家装设计分享</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">装修灵感集</div>
+            <div class="nav-links">
+                <a href="#" class="active">首页</a>
+                <a href="#">设计案例</a>
+                <a href="#">装修攻略</a>
+                <a href="#">找设计师</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="grid-container">
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7" alt="北欧风客厅">
+                <div class="card-content">
+                    <h3>超治愈的北欧风客厅｜打造温馨舒适的生活空间</h3>
+                    <p>这个120平的北欧风装修案例，光线充足，空间感极佳...</p>
+                    <div class="card-footer">
+                        <div class="author">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="作者头像">
+                            <span>设计师小王</span>
+                        </div>
+                        <div class="stats">
+                            <span><i class="far fa-heart"></i> 2.4k</span>
+                            <span><i class="far fa-comment"></i> 168</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 更多卡片可以复制上面的结构 -->
+        </div>
+    </main>
+
+    <script>
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('click', function() {
+                // 切换展开状态
+                this.classList.toggle('expanded');
+                
+                // 如果卡片展开，禁止背景滚动
+                if (this.classList.contains('expanded')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+
+        // 点击其他区域关闭展开的卡片
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.card')) return;
+            
+            document.querySelectorAll('.card.expanded').forEach(card => {
+                card.classList.remove('expanded');
+                document.body.style.overflow = '';
+            });
+        });
+
+        const cards = document.querySelectorAll('.card');
+        const container = document.querySelector('.grid-container');
+
+        cards.forEach(card => {
+            // 检测卡片是否触碰到容器边缘
+            function checkCollision(card) {
+                const cardRect = card.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                
+                // 计算卡片相对于容器的位置
+                const leftEdge = cardRect.left <= containerRect.left + 30;
+                const rightEdge = cardRect.right >= containerRect.right - 30;
+                
+                if (leftEdge || rightEdge) {
+                    card.classList.add('colliding');
+                    // 短暂延迟后移除碰撞类名
+                    setTimeout(() => {
+                        card.classList.remove('colliding');
+                    }, 500);
+                }
+            }
+
+            // 监听动画迭代
+            card.addEventListener('animationiteration', () => {
+                checkCollision(card);
+            });
+
+            // 鼠标进入效果
+            card.addEventListener('mouseenter', function() {
+                this.style.animationPlayState = 'paused';
+                this.style.transform = 'scale(1.1)';
+                this.style.zIndex = '10';
+            });
+
+            // 鼠标离开效果
+            card.addEventListener('mouseleave', function() {
+                this.style.animationPlayState = 'running';
+                this.style.transform = 'none';
+                this.style.zIndex = '1';
+                
+                setTimeout(() => {
+                    this.style.animation = 'bounce 1s infinite ease-in-out';
+                }, 300);
+            });
+        });
+
+        // 优化性能：只在视口中的卡片播放动画
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                } else {
+                    entry.target.style.animationPlayState = 'paused';
+                }
+            });
+        }, observerOptions);
+
+        cards.forEach(card => observer.observe(card));
+    </script>
+</body>
+</html> 
